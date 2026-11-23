@@ -296,6 +296,12 @@ details div{margin-top:10px;color:var(--ink);font-size:15px;display:grid;gap:6px
   window.addEventListener('hashchange',route);
   var h0=(location.hash||'').slice(1); if(views[h0]&&h0!=='home'){document.getElementById('v-home').hidden=true;var t=document.getElementById(views[h0]);t.hidden=false;t.className='view enter';cur=h0;}
 
+  /* Ghi vào Google Sheet của shop (Apps Script). Để trống thì bỏ qua. */
+  var SHEET_URL='https://script.google.com/macros/s/AKfycbyih9VjJuBSn9uZIRqTcTALrVnqPLlgdzCVCgNTKaldrOX-xfBpkBQJI9T1-lgmpaWOfA/exec';
+  function guiSheet(d){
+    if(!SHEET_URL) return;
+    try{ fetch(SHEET_URL,{method:'POST',mode:'no-cors',keepalive:true,headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(d)}).catch(function(){}); }catch(e){}
+  }
   function copy(t,cb){
     var ok=function(){cb(true)}, fail=function(){cb(false)};
     try{ if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(ok,fail);} else fail(); }catch(e){fail();}
@@ -332,6 +338,8 @@ details div{margin-top:10px;color:var(--ink);font-size:15px;display:grid;gap:6px
       }
       if(bad){var first=f.querySelector('.field.bad input, .field.bad select, .field.bad textarea')||document.getElementById('bl-ok'); if(first) first.focus(); return;}
       text=head+'\nHọ tên: '+ten+'\nSĐT: '+sdt+'\nMã đơn hàng: '+don+'\nSản phẩm: '+sp+extra;
+      guiSheet({loai:k==='kh'?'Kích hoạt bảo hành':'Báo lỗi',ten:ten,sdt:sdt,don:don,sp:sp,
+        ngay:k==='kh'&&ngay?ngay.split('-').reverse().join('/'):'',loi:k==='bl'?loi:'',mota:k==='bl'?mota:'',note:k==='kh'?note:''});
       pv.textContent=text;
       f.hidden=true; done.hidden=false; done.className='done view enter';
       doCopy(k==='kh'?'Đã chép nội dung. Còn 1 bước nữa.':'Đã chép nội dung. Còn 2 bước nữa.');
